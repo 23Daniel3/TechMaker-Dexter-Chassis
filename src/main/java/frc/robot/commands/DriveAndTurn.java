@@ -15,7 +15,7 @@ public class DriveAndTurn extends SequentialCommandGroup {
     Drivetrain drive = Drivetrain.getInstance();
     addCommands(
       new ResetOdometry(),
-      new InstantCommand(()->drive.breake(true),drive),
+      new InstantCommand(()->drive.brake(true),drive),
       new DriveDistance(distance,drive),
       new WaitCommand(0.5),
       new DriveAngle(angle,drive)

@@ -27,7 +27,7 @@ public class DriveBalance extends Command {
     waiting = false;
     direction = 1;
     drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
-    drive.breake(true);
+    drive.brake(true);
     drive.resetEncoders();
   }
 

@@ -26,7 +26,7 @@ public class AutonomousCmd extends Command {
     status = 0;
     direction = 1;
     drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
-    drive.breake(true);
+    drive.brake(true);
     drive.resetEncoders();
     this.park = park;
     SmartDashboard.putBoolean("Park", park);
