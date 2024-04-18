@@ -23,19 +23,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import com.ctre.phoenix6.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
 
   // Motores de tração
-  private CANSparkMax motorLeftFront = new CANSparkMax(DrivetrainConstants.kMotorLeftFront, MotorType.kBrushless);
-  private CANSparkMax motorLeftRear = new CANSparkMax(DrivetrainConstants.kMotorLeftRear, MotorType.kBrushless);
-  private CANSparkMax motorRightFront = new CANSparkMax(DrivetrainConstants.kMotorRightFront, MotorType.kBrushless);
-  private CANSparkMax motorRightRear = new CANSparkMax(DrivetrainConstants.kMotorRightRear, MotorType.kBrushless);
+  private VictorSPX motorLeftFront = new VictorSPX(DrivetrainConstants.kMotorLeftFront, MotorType.kBrushed);
+  private VictorSPX motorLeftRear = new VictorSPX(DrivetrainConstants.kMotorLeftRear, MotorType.kBrushed);
+  private VictorSPX motorRightFront = new VictorSPX(DrivetrainConstants.kMotorRightFront, MotorType.kBrushed);
+  private VictorSPX motorRightRear = new VictorSPX(DrivetrainConstants.kMotorRightRear, MotorType.kBrushed);
   MotorController m_leftMotor = new MotorController(motorLeftFront, motorLeftRear);
   MotorController m_rightMotor = new MotorController(motorRightFront, motorRightRear);
   private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
