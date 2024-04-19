@@ -4,48 +4,37 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+//import edu.wpi.first.math.VecBuilder;
+//import edu.wpi.first.math.controller.PIDController;
+//import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.filter.SlewRateLimiter;
+//import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+//import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.math.util.Units;
+//import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+//import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
-
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
-import com.ctre.phoenix6.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 
 public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
 
   // Motores de tração
-  private VictorSPX motorLeftFront = new VictorSPX(DrivetrainConstants.kMotorLeftFront, MotorType.kBrushed);
-  private VictorSPX motorLeftRear = new VictorSPX(DrivetrainConstants.kMotorLeftRear, MotorType.kBrushed);
-  private VictorSPX motorRightFront = new VictorSPX(DrivetrainConstants.kMotorRightFront, MotorType.kBrushed);
-  private VictorSPX motorRightRear = new VictorSPX(DrivetrainConstants.kMotorRightRear, MotorType.kBrushed);
-  MotorController m_leftMotor = new MotorController(motorLeftFront, motorLeftRear);
-  MotorController m_rightMotor = new MotorController(motorRightFront, motorRightRear);
-  private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
-
-  // Encoders. São utilizados os enconders internos dos motores
-  // Para maior precisão é usada a media dos dois motores
-  private RelativeEncoder leftEncoder1, leftEncoder2;
-  private RelativeEncoder rightEncoder1, rightEncoder2;
+  private WPI_VictorSPX motorLeftFront = new WPI_VictorSPX(DrivetrainConstants.kMotorLeftFront);
+  private WPI_VictorSPX motorLeftFollower = new WPI_VictorSPX(DrivetrainConstants.kMotorLeftRear);
+  private WPI_VictorSPX motorRightFront = new WPI_VictorSPX(DrivetrainConstants.kMotorRightFront);
+  private WPI_VictorSPX motorRightFollower = new WPI_VictorSPX(DrivetrainConstants.kMotorRightRear);
+  private final DifferentialDrive m_diffDrive = new DifferentialDrive(motorLeftFront, motorRightFront);
 
   // Placa de navegação
   private AHRS m_gyro;
@@ -54,54 +43,20 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDriveKinematics kinematics;
   private Field2d field = new Field2d();
 
-  private final DifferentialDriveOdometry m_odometry;
-
   private DifferentialDrivePoseEstimator m_poseEstimator;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateFoward);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateTurn);
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
-  private final PIDController m_leftPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
-  private final PIDController m_rightPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
+  //private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateFoward);
+  //private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateTurn);
+  //private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
+  //private final PIDController m_leftPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
+  //private final PIDController m_rightPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
 
-  /** Creates a new Drivetrain. */
+  /** Creates a new Drivetrain. 
   public Drivetrain() {
-    // Reseto qualquer configuração nos modulos e refaço elas do zero
-    motorLeftFront.restoreFactoryDefaults();
-    motorLeftRear.restoreFactoryDefaults();
-    motorRightFront.restoreFactoryDefaults();
-    motorRightRear.restoreFactoryDefaults();
-
-    // Deixo os motores girarem livre para não tombar
-    motorLeftFront.setIdleMode(IdleMode.kCoast);
-    motorLeftRear.setIdleMode(IdleMode.kCoast);
-    motorRightFront.setIdleMode(IdleMode.kCoast);
-    motorRightRear.setIdleMode(IdleMode.kCoast);
 
     // Inverto o sentido da esquerda para rodarem iguais
-    motorRightFront.setInverted(true);
-    motorRightRear.setInverted(true);
     setMaxOutput(false);
-
-    // Busco o objeto encoder de cada modulo e associo
-    leftEncoder1 = motorLeftRear.getEncoder();
-    rightEncoder1 = motorRightRear.getEncoder();
-    leftEncoder2 = motorLeftFront.getEncoder();
-    rightEncoder2 = motorRightFront.getEncoder();
-
-    // Configuro o fator do encoder para 1 - 1 pulso por volta.
-    leftEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
-    leftEncoder2.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
-    rightEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
-    rightEncoder2.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
-    motorLeftFront.burnFlash();
-    motorLeftRear.burnFlash();
-    motorRightFront.burnFlash();
-    motorRightRear.burnFlash();
-
-    // Seto a posição para no começo
-    resetEncoders();
 
     // Associo a placa de navegação e reseto ela
     m_gyro = new AHRS(DrivetrainConstants.NAVX_PORT);
@@ -119,7 +74,29 @@ public class Drivetrain extends SubsystemBase {
         VecBuilder.fill(0.02, 0.02, 0.01),
         VecBuilder.fill(0.1, 0.1, 0.1));
 
-  }
+  } */
+
+  public void robotInit() {
+        /* factory default values */
+        motorRightFront.configFactoryDefault();
+        motorRightFollower.configFactoryDefault();
+        motorLeftFront.configFactoryDefault();
+        motorRightFollower.configFactoryDefault();
+
+        /* set up followers */
+        motorRightFollower.follow(motorRightFront);
+        motorLeftFollower.follow(motorLeftFront);
+
+        /* [3] flip values so robot moves forward when stick-forward/LEDs-green */
+        motorRightFront.setInverted(true); // !< Update this
+        motorLeftFront.setInverted(false); // !< Update this
+
+        /*
+         * set the invert of the followers to match their respective master controllers
+         */
+        motorRightFollower.setInverted(InvertType.FollowMaster);
+        motorLeftFollower.setInverted(InvertType.FollowMaster);
+    }
 
   public static Drivetrain getInstance() {
     if (instance == null) {
@@ -133,15 +110,10 @@ public class Drivetrain extends SubsystemBase {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
-    final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
-    final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
-
-    final double leftOutput =
-        m_leftPIDController.calculate(leftEncoder1.getVelocity(), speeds.leftMetersPerSecond);
-    final double rightOutput =
-        m_rightPIDController.calculate(rightEncoder1.getVelocity(), speeds.rightMetersPerSecond);
-    m_leftMotor.setVoltage(leftOutput + leftFeedforward);
-    m_rightMotor.setVoltage(rightOutput + rightFeedforward);
+   // final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
+   // final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
+   // motorLeftFront.setVoltage(leftOutput + leftFeedforward);
+   // motorRightFront.setVoltage(rightOutput + rightFeedforward);
   }
 
   /**
@@ -155,8 +127,7 @@ public class Drivetrain extends SubsystemBase {
     setSpeeds(wheelSpeeds);
   }
   public void updatePose() {
-    m_odometry.update(m_gyro.getRotation2d(), Units.inchesToMeters(leftEncoder1.getPosition()),
-        Units.inchesToMeters(rightEncoder1.getPosition()));
+    //m_odometry.update(m_gyro.getRotation2d());
     field.setRobotPose(m_poseEstimator.getEstimatedPosition());
 
   }
@@ -170,18 +141,15 @@ public class Drivetrain extends SubsystemBase {
   // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Distancia Esquerda", getLeftDistanceMeters());
-    SmartDashboard.putNumber("Distancia Direita", getRightDistanceMeters());
-    SmartDashboard.putNumber("Distancia Total", GetAverageEncoderDistance());
     SmartDashboard.putNumber("Giro", getYaw());
     SmartDashboard.putNumber("Roll", getRoll());
     SmartDashboard.putNumber("Angle", getPitch());
     SmartDashboard.putData("Train", m_diffDrive);
 
-    m_poseEstimator.update(m_gyro.getRotation2d(),
-        getLeftDistanceMeters(),
-        getRightDistanceMeters());
-    updatePose();
+    //m_poseEstimator.update(m_gyro.getRotation2d(),
+        //getLeftDistanceMeters(),
+       // getRightDistanceMeters());
+    //updatePose();
   }
   public void feed(){
     m_diffDrive.feed();
@@ -219,20 +187,6 @@ public class Drivetrain extends SubsystemBase {
       m_diffDrive.setMaxOutput(1.0);
   }
 
-  public void brake(boolean set) {
-    if (set) {
-      motorLeftFront.setIdleMode(IdleMode.kBrake);
-      motorLeftRear.setIdleMode(IdleMode.kBrake);
-      motorRightFront.setIdleMode(IdleMode.kBrake);
-      motorRightRear.setIdleMode(IdleMode.kBrake);
-    } else {
-      motorLeftFront.setIdleMode(IdleMode.kCoast);
-      motorLeftRear.setIdleMode(IdleMode.kCoast);
-      motorRightFront.setIdleMode(IdleMode.kCoast);
-      motorRightRear.setIdleMode(IdleMode.kCoast);
-    }
-  }
-
   public void arcadeDrive(double forward, double rotation) {
 
     SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
@@ -243,14 +197,14 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void tankDriveVolts(double left, double right) {
-    m_leftMotor.setVoltage(left);
-    m_rightMotor.setVoltage(right);
+    motorLeftFront.setVoltage(left);
+    motorRightFront.setVoltage(right);
     m_diffDrive.feed();
   }
 
   public void tankDrive(double left, double right) {
-    m_leftMotor.set(left);
-    m_rightMotor.set(right);
+    motorLeftFront.set(left);
+    motorRightFront.set(right);
     m_diffDrive.feed();
 
   }
@@ -260,54 +214,19 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getLeftPower() {
-    return (motorLeftFront.get() + motorLeftRear.get()) / 2;
+    return (motorLeftFront.get() + motorLeftFollower.get()) / 2;
   }
 
   public double getRightPower() {
-    return (motorRightFront.get() + motorRightRear.get()) / 2;
-  }
-
-  /*
-   * Funções para pegar os encoders
-   * Essas funções retornam as medias dos dois encoders de cada lado
-   * Alem disso já faz a conta do numero de pulsos dividido pela razão da caixa de
-   * redução
-   * e multiplicado pelo perimetro da roda para ter o resultado em metros
-   */
-  public double GetAverageEncoderDistance() {
-    return ((getRightDistanceMeters() + getLeftDistanceMeters()) / 2.0);
-  }
-
-  public double getRightDistanceMeters() {
-    return getRightEncoder();
-  }
-
-  public double getLeftDistanceMeters() {
-    return getLeftEncoder();
-  }
-
-  public double getRightEncoder() {
-    return ((rightEncoder1.getPosition() + rightEncoder2.getPosition()) / 2.0);
-  }
-
-  public double getLeftEncoder() {
-    return (leftEncoder1.getPosition() + leftEncoder2.getPosition()) / 2.0;
-  }
-
-  // função de reset dos encoders definindo ponto inicial do robo
-  public void resetEncoders() {
-    leftEncoder1.setPosition(0);
-    leftEncoder2.setPosition(0);
-    rightEncoder1.setPosition(0);
-    rightEncoder2.setPosition(0);
+    return (motorRightFront.get() + motorRightFollower.get()) / 2;
   }
 
   /**
    * Funções de telemetria
-   */
+   
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
-  }
+  }*/
 
   // Captura o angulo que o robo está apontando
   public double getYaw() {
@@ -345,11 +264,10 @@ public class Drivetrain extends SubsystemBase {
    * @param pose The pose to which to set the odometry
    */
   public void resetOdometry(Pose2d pose) {
-    resetEncoders();
-    zeroHeading();
-    m_odometry.resetPosition(m_gyro.getRotation2d(),
-        getLeftDistanceMeters(), getRightDistanceMeters(),
-        pose);
+   // zeroHeading();
+   // m_odometry.resetPosition(m_gyro.getRotation2d(),
+   //     getLeftDistanceMeters(), getRightDistanceMeters(),
+       // pose);
   }
 
 }
