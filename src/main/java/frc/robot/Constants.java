@@ -1,16 +1,11 @@
-
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 public final class Constants {
-  /*
-   * 
-   */
+  
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-
   }
 
   public static class DrivetrainConstants {
@@ -46,11 +41,6 @@ public final class Constants {
     public static final double kV = 3;
 
   }
-  public static class PDPConstants {
-    public static final int kID = 1;
-    public static final ModuleType kModule = ModuleType.kCTRE;
-    public static final double kMinimumVoltage = 10.5;
-  }
 
   public static class autonomousConstants{
     public static final double kDistanceToPark[] = {0.8,0.4,0};
@@ -62,14 +52,9 @@ public final class Constants {
     public static final double kDriveVoltageSlow = 3;
     public static final double kMaxAngle= 5;
     public static final double kMinAngle = 0.75;
-    public static final double kExtendArmTime = 1.5;
-    public static final double kRetractArmTime = 1.3;
     public static final double kReleaseTime = 0.5;
     public static final double kDistanceOutCommunity = 4;
     public static final double kWaitTimeToDock = 3;
     public static final double kDistanceDock = 2.2;
-
   }
-  
-
 }
