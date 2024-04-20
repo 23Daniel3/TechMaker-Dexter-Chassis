@@ -10,14 +10,13 @@ public final class Constants {
    */
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int kOperatorControllerPort = 1;
 
   }
 
   public static class DrivetrainConstants {
     public static final int kMotorLeftFront = 1;
-    public static final int kMotorLeftRear = 2;
-    public static final int kMotorRightFront = 3;
+    public static final int kMotorLeftRear = 3;
+    public static final int kMotorRightFront = 2;
     public static final int kMotorRightRear = 4;
     public static final int kMotorCurrentLimit = 40;
     public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;

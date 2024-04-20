@@ -21,11 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
-import com.kauailabs.navx.frc.AHRS;
+//import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
-
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 public class Drivetrain extends SubsystemBase {
   private static Drivetrain instance;
 
@@ -34,10 +34,10 @@ public class Drivetrain extends SubsystemBase {
   private WPI_VictorSPX motorLeftFollower = new WPI_VictorSPX(DrivetrainConstants.kMotorLeftRear);
   private WPI_VictorSPX motorRightFront = new WPI_VictorSPX(DrivetrainConstants.kMotorRightFront);
   private WPI_VictorSPX motorRightFollower = new WPI_VictorSPX(DrivetrainConstants.kMotorRightRear);
-  private final DifferentialDrive m_diffDrive = new DifferentialDrive(motorLeftFront, motorRightFront);
+  private DifferentialDrive m_diffDrive;
 
   // Placa de navegação
-  private AHRS m_gyro;
+  //private AHRS m_gyro;
 
   // Odometry class for tracking robot pose
   private DifferentialDriveKinematics kinematics;
@@ -45,44 +45,17 @@ public class Drivetrain extends SubsystemBase {
 
   private DifferentialDrivePoseEstimator m_poseEstimator;
 
-  // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  //private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateFoward);
-  //private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateTurn);
-  //private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
-  //private final PIDController m_leftPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
-  //private final PIDController m_rightPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
-
-  /** Creates a new Drivetrain. 
-  public Drivetrain() {
-
-    // Inverto o sentido da esquerda para rodarem iguais
-    setMaxOutput(false);
-
-    // Associo a placa de navegação e reseto ela
-    m_gyro = new AHRS(DrivetrainConstants.NAVX_PORT);
-    resetYaw();
-    Pose2d initialPose = new Pose2d(0, 1.5, m_gyro.getRotation2d());
-    kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(DrivetrainConstants.kTrackwidth));
-    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(),
-        getLeftDistanceMeters(), getRightDistanceMeters(),
-        initialPose);
-
-    m_poseEstimator = new DifferentialDrivePoseEstimator(kinematics,
-        m_gyro.getRotation2d(),
-        getLeftDistanceMeters(), getRightDistanceMeters(),
-        initialPose,
-        VecBuilder.fill(0.02, 0.02, 0.01),
-        VecBuilder.fill(0.1, 0.1, 0.1));
-
-  } */
-
-  public void robotInit() {
-        /* factory default values */
+  public Drivetrain(){
+     /* factory default values */
         motorRightFront.configFactoryDefault();
         motorRightFollower.configFactoryDefault();
         motorLeftFront.configFactoryDefault();
         motorRightFollower.configFactoryDefault();
 
+        motorLeftFollower.setNeutralMode(NeutralMode.Brake);
+        motorLeftFront.setNeutralMode(NeutralMode.Brake);
+        motorRightFollower.setNeutralMode(NeutralMode.Brake);
+        motorRightFront.setNeutralMode(NeutralMode.Brake);
         /* set up followers */
         motorRightFollower.follow(motorRightFront);
         motorLeftFollower.follow(motorLeftFront);
@@ -96,7 +69,8 @@ public class Drivetrain extends SubsystemBase {
          */
         motorRightFollower.setInverted(InvertType.FollowMaster);
         motorLeftFollower.setInverted(InvertType.FollowMaster);
-    }
+        m_diffDrive = new DifferentialDrive(motorLeftFront, motorRightFront);
+  }
 
   public static Drivetrain getInstance() {
     if (instance == null) {
@@ -141,9 +115,9 @@ public class Drivetrain extends SubsystemBase {
   // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Giro", getYaw());
-    SmartDashboard.putNumber("Roll", getRoll());
-    SmartDashboard.putNumber("Angle", getPitch());
+   // SmartDashboard.putNumber("Giro", getYaw());
+   // SmartDashboard.putNumber("Roll", getRoll());
+   // SmartDashboard.putNumber("Angle", getPitch());
     SmartDashboard.putData("Train", m_diffDrive);
 
     //m_poseEstimator.update(m_gyro.getRotation2d(),
@@ -229,7 +203,7 @@ public class Drivetrain extends SubsystemBase {
   }*/
 
   // Captura o angulo que o robo está apontando
-  public double getYaw() {
+ /*  public double getYaw() {
     return m_gyro.getYaw();
   }
 
@@ -248,15 +222,15 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Zeroes the heading of the robot
-   */
+   
   public void zeroHeading() {
     m_gyro.reset();
   }
 
-  /** Reset the gyro. */
+  /** Reset the gyro. 
   public void resetGyro() {
     m_gyro.reset();
-  }
+  }*/
 
   /**
    * Resets the odometry to the specified pose
